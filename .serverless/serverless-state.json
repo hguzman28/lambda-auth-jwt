@@ -1,0 +1,375 @@
+{
+  "service": {
+    "service": "lambda-get-jwt-dev",
+    "serviceObject": {
+      "name": "lambda-get-jwt-dev"
+    },
+    "provider": {
+      "name": "aws",
+      "memorySize": 3024,
+      "timeout": 900,
+      "ecr": {
+        "images": {
+          "appimage": {
+            "path": "./"
+          }
+        }
+      },
+      "region": "us-east-1",
+      "endpointType": "REGIONAL",
+      "stage": "dev",
+      "iam": {
+        "role": "arn:aws:iam::864673161229:role/lambda_cron_rol"
+      },
+      "deploymentBucket": "app-vendedor-staging",
+      "versionFunctions": true,
+      "deploymentBucketObject": {
+        "name": "app-vendedor-staging"
+      },
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "AppLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/lambda-get-jwt-dev"
+            }
+          },
+          "AppLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "ImageUri": "864673161229.dkr.ecr.us-east-1.amazonaws.com/serverless-lambda-get-jwt-dev-dev@sha256:de780e5e39ae4204a8a2ecda26438548e834e101d297f79f9f36506706c22c86"
+              },
+              "PackageType": "Image",
+              "FunctionName": "lambda-get-jwt-dev",
+              "MemorySize": 3024,
+              "Timeout": 900,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "dev",
+                  "UserPoolId": "us-east-1_F3gJ8pDMK",
+                  "ClientId": "3bp5ksbljnkhjbqrp5alio1i4t"
+                }
+              },
+              "Role": "arn:aws:iam::864673161229:role/lambda_cron_rol",
+              "VpcConfig": {
+                "SecurityGroupIds": [
+                  "sg-061a0e3a3e65ad7f3"
+                ],
+                "SubnetIds": [
+                  "subnet-062608ece455a5dcc",
+                  "subnet-0d841902b0e42a389"
+                ]
+              }
+            },
+            "DependsOn": [
+              "AppLogGroup"
+            ]
+          },
+          "AppLambdaVersionNurUJINzPz90lT4U0nEpP8qqTJR1ylyg8hmaWS2Ypg": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "AppLambdaFunction"
+              },
+              "CodeSha256": "de780e5e39ae4204a8a2ecda26438548e834e101d297f79f9f36506706c22c86"
+            }
+          },
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "dev-lambda-get-jwt-dev",
+              "EndpointConfiguration": {
+                "Types": [
+                  "REGIONAL"
+                ]
+              },
+              "Policy": ""
+            }
+          },
+          "ApiGatewayResourceLambdaDashgetDashjwt": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "lambda-get-jwt",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodLambdaDashgetDashjwtOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'*'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceLambdaDashgetDashjwt"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodLambdaDashgetDashjwtAny": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "ANY",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceLambdaDashgetDashjwt"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "AppLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "AppLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayDeployment1675098400218": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodLambdaDashgetDashjwtOptions",
+              "ApiGatewayMethodLambdaDashgetDashjwtAny"
+            ]
+          },
+          "AppLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "AppLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "app-vendedor-staging",
+            "Export": {
+              "Name": "sls-lambda-get-jwt-dev-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "AppLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "AppLambdaVersionNurUJINzPz90lT4U0nEpP8qqTJR1ylyg8hmaWS2Ypg"
+            },
+            "Export": {
+              "Name": "sls-lambda-get-jwt-dev-dev-AppLambdaFunctionQualifiedArn"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-lambda-get-jwt-dev-dev-ServiceEndpoint"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "custom": {
+      "stages": [
+        "dev",
+        "prd"
+      ]
+    },
+    "pluginsData": {},
+    "functions": {
+      "app": {
+        "image": {
+          "name": "appimage"
+        },
+        "name": "lambda-get-jwt-dev",
+        "vpc": {
+          "securityGroupIds": {
+            "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"AppLambdaFunction\"][\"Properties\"][\"VpcConfig\"][\"SecurityGroupIds\"]"
+          },
+          "subnetIds": {
+            "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"AppLambdaFunction\"][\"Properties\"][\"VpcConfig\"][\"SubnetIds\"]"
+          }
+        },
+        "environment": {
+          "STAGE": "dev",
+          "UserPoolId": "us-east-1_F3gJ8pDMK",
+          "ClientId": "3bp5ksbljnkhjbqrp5alio1i4t"
+        },
+        "events": [
+          {
+            "http": {
+              "method": "any",
+              "path": "lambda-get-jwt",
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "ANY"
+                ],
+                "headers": [
+                  "*"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "package": {},
+        "memory": 3024,
+        "timeout": 900,
+        "versionLogicalId": "AppLambdaVersionNurUJINzPz90lT4U0nEpP8qqTJR1ylyg8hmaWS2Ypg"
+      }
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless.yaml",
+    "initialServerlessConfig": {
+      "service": "lambda-get-jwt-dev",
+      "package": {
+        "individually": true,
+        "deploymentBucket": "app-vendedor-staging",
+        "artifactDirectoryName": "serverless/lambda-get-jwt-dev/dev/1675098401297-2023-01-30T17:06:41.297Z"
+      },
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "custom": {
+        "$ref": "$[\"service\"][\"custom\"]"
+      },
+      "functions": {
+        "$ref": "$[\"service\"][\"functions\"]"
+      }
+    },
+    "layers": {},
+    "isDashboardMonitoringPreconfigured": false
+  },
+  "package": {
+    "individually": true,
+    "artifactDirectoryName": "serverless/lambda-get-jwt-dev/dev/1675098401297-2023-01-30T17:06:41.297Z",
+    "artifact": ""
+  }
+}

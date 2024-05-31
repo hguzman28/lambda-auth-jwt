@@ -1,0 +1,57 @@
+service: ${env:NAME_REPOSITORY_CUSTOM}-${sls:stage}
+
+package:
+  individually: true
+
+provider:
+  name: aws
+
+  memorySize: 5024 # optional, in MB, default is 1024
+
+  timeout: 900
+  ecr:
+    # In this section you can define images that will be built locally and uploaded to ECR
+    images:
+      appimage:
+        path: ./
+  region: us-east-1
+  endpointType: REGIONAL
+  stage: ${opt:stage, "dev"}
+  iam:
+    role: arn:aws:iam::864673161229:role/lambda_cron_rol
+  deploymentBucket:
+    name: app-vendedor-staging
+
+custom:
+  stages:
+    - dev
+    - prd
+
+functions:
+  app:
+    image:
+      name: appimage
+    name: ${env:NAME_REPOSITORY_CUSTOM}-${sls:stage}
+
+
+    vpc:
+      securityGroupIds:
+        - sg-061a0e3a3e65ad7f3
+      subnetIds:
+        - subnet-062608ece455a5dcc
+        - subnet-0d841902b0e42a389
+    environment:
+      STAGE: ${self:provider.stage}
+      UserPoolId: us-east-1_Z3fEEsjmu
+      ClientId: 6vsb430r28f6h5sobotmit1cv2
+
+    events:
+       - http:
+          method: any
+          path: jwt
+          cors:
+            headers: '*'
+
+
+
+      
